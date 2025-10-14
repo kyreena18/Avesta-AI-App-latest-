@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Avesta AI Resume Search</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+    <div class="container">
+        <h1>Avesta AI Resume Search</h1>
+        <p>Find the best candidates using your existing index.</p>
+
+        <section class="card">
+            <h2>1) Job Description → Ranked Profiles</h2>
+            <form id="form-jd">
+                <textarea name="jd" rows="6" placeholder="Paste job description here..."></textarea>
+                <button type="submit">Search</button>
+            </form>
+            <div id="jd-results" class="results"></div>
+        </section>
+
+        <section class="card">
+            <h2>2) Skills + Minimum Experience</h2>
+            <form id="form-skills">
+                <input name="skills" type="text" placeholder="e.g., Python, AWS, NLP" />
+                <input name="years" type="number" min="0" placeholder="Years (e.g., 3)" />
+                <button type="submit">Search</button>
+            </form>
+            <div id="skills-results" class="results"></div>
+        </section>
+
+        <section class="card">
+            <h2>3) Education Level</h2>
+            <form id="form-edu">
+                <input name="levels" type="text" placeholder="e.g., Masters, PhD" />
+                <button type="submit">Search</button>
+            </form>
+            <div id="edu-results" class="results"></div>
+        </section>
+
+        <section class="card">
+            <h2>4) General Question</h2>
+            <form id="form-general">
+                <input name="q" type="text" placeholder="Ask a question..." />
+                <label><input type="checkbox" name="include_notes" value="y" /> Include interview notes</label>
+                <button type="submit">Search</button>
+            </form>
+            <div id="general-results" class="results"></div>
+        </section>
+    </div>
+
+    <script>
+        async function postForm(url, form) {
+            const formData = new FormData(form);
+            const res = await fetch(url, { method: 'POST', body: formData });
+            return await res.json();
+        }
+
+        function renderResults(el, data, showScore=false) {
+            const items = data.results || [];
+            if (!items.length) { el.innerHTML = '<p>No results.</p>'; return; }
+            el.innerHTML = items.map((r, idx) => `
+                <div class="result-item">
+                    <div class="result-header"><strong>${idx+1}. ${r.name || r.id}</strong></div>
+                    <div class="result-actions">
+                        ${r.resume ? `<a href="/resume/${encodeURIComponent(r.resume)}" target="_blank">Open resume</a>` : `<span>Original resume not found</span>`}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('form-jd').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = await postForm('/api/search/jd', e.target);
+            renderResults(document.getElementById('jd-results'), data);
+        });
+
+        document.getElementById('form-skills').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = await postForm('/api/search/skills', e.target);
+            renderResults(document.getElementById('skills-results'), data, true);
+        });
+
+        document.getElementById('form-edu').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = await postForm('/api/search/education', e.target);
+            renderResults(document.getElementById('edu-results'), data, true);
+        });
+
+        document.getElementById('form-general').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            // checkbox value as 'y' or not
+            if (form.include_notes && form.include_notes.checked) {
+                form.include_notes.value = 'y';
+            }
+            const data = await postForm('/api/search/general', form);
+            renderResults(document.getElementById('general-results'), data);
+        });
+    </script>
+</body>
+</html>
+
+

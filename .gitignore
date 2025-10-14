@@ -1,0 +1,12 @@
+﻿# Ignore environment and cache files
+.env
+__pycache__/
+*.pkl
+*.pyc
+*.log
+# Ignore temporary or local folders
+cleaned_resumes/
+processed resumes/
+resume_db/
+interview_notes/
+resumes.index

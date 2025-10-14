@@ -1,0 +1,45 @@
+import os
+import faiss
+import pickle
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+# Folder with cleaned resumes
+cleaned_folder = "C:/Users/Kyreena/OneDrive/Desktop/Avesta AI App/cleaned_resumes"
+
+# Step 1: Collect all resume texts
+resumes = []
+filenames = []
+
+for file in os.listdir(cleaned_folder):
+    path = os.path.join(cleaned_folder, file)
+    if os.path.isfile(path):
+        with open(path, "r", encoding="utf-8") as f:
+            text = f.read()
+            if text.strip():  # only add if not empty
+                resumes.append(text)
+                filenames.append(file)
+
+if not resumes:
+    raise ValueError("⚠️ No resumes found in cleaned_resumes folder.")
+
+# Step 2: Create embeddings locally
+print("🔄 Generating embeddings locally (this may take a few seconds)...")
+model = SentenceTransformer("all-MiniLM-L6-v2")  # lightweight and fast
+embeddings = model.encode(
+    resumes,
+    convert_to_numpy=True,
+    normalize_embeddings=True
+).astype("float32")
+
+# Step 3: Build FAISS index
+dimension = embeddings.shape[1]  # embedding size
+index = faiss.IndexFlatL2(dimension)
+index.add(embeddings)
+
+# Save index + metadata
+faiss.write_index(index, "resumes.index")
+with open("resume_metadata.pkl", "wb") as f:
+    pickle.dump(filenames, f)
+
+print("✅ Resumes indexed successfully with local embeddings!")
