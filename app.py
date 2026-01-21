@@ -101,36 +101,16 @@ def score_education(text: str, levels: List[str]) -> float:
     text_lower = text.lower()
     score = 0.0
     keywords = {
-        "phd": ["phd", "doctor of philosophy", "ph.d", "ph.d.", "doctorate", "doctoral"],
-        "masters": ["masters", "m.s.", "ms ", "m.tech", "mtech", "m.sc", "msc", "master of", "mba"],
-        "bachelors": ["bachelors", "b.e.", "btech", "b.tech", "b.sc", "bsc", "bca", "b.eng", "bachelor of", "bachelor's"],
+        "phd": ["phd", "doctor of philosophy"],
+        "masters": ["masters", "m.s.", "ms ", "m.tech", "mtech", "m.sc", "msc"],
+        "bachelors": ["bachelors", "b.e.", "btech", "b.tech", "b.sc", "bsc", "bca", "b.eng"],
     }
     for level in levels:
-        level_lower = level.lower()
-        if level_lower in keywords:
-            for kw in keywords[level_lower]:
-                if kw in text_lower:
-                    score += 1.0
-                    break
+        for kw in keywords.get(level.lower(), []):
+            if kw in text_lower:
+                score += 1.0
+                break
     return score
-
-
-def keyword_filter_education(text: str, levels: List[str]) -> bool:
-    """Strict keyword filtering for education levels - returns True only if exact match found"""
-    text_lower = text.lower()
-    keywords = {
-        "phd": ["phd", "doctor of philosophy", "ph.d", "ph.d.", "doctorate", "doctoral"],
-        "masters": ["masters", "m.s.", "ms ", "m.tech", "mtech", "m.sc", "msc", "master of", "mba"],
-        "bachelors": ["bachelors", "b.e.", "btech", "b.tech", "b.sc", "bsc", "bca", "b.eng", "bachelor of", "bachelor's"],
-    }
-    
-    for level in levels:
-        level_lower = level.lower()
-        if level_lower in keywords:
-            for kw in keywords[level_lower]:
-                if kw in text_lower:
-                    return True
-    return False
 
 
 # ✅ Step 4: Interactive Interface
@@ -200,33 +180,14 @@ def main():
             edu_input = input("Desired education levels (comma-separated: Bachelors, Masters, PhD):\n> ").strip()
             levels = [e.strip() for e in edu_input.split(",") if e.strip()]
             semantic_query = "candidates with " + ", ".join(levels)
-            candidates = search_profiles(semantic_query, top_k=20, include_notes=False)  # Get more candidates for filtering
-            
-            # First filter by strict keyword matching
-            keyword_filtered = []
+            candidates = search_profiles(semantic_query, top_k=10, include_notes=False)
+            rescored = []
             for rid, doc, dist, meta in candidates:
-                if keyword_filter_education(doc, levels):
-                    keyword_filtered.append((rid, doc, dist, meta))
-            
-            # If we have keyword matches, use those; otherwise fall back to scoring
-            if keyword_filtered:
-                rescored = []
-                for rid, doc, dist, meta in keyword_filtered:
-                    edu_score = score_education(doc, levels)
-                    combined = (1 - dist) + 0.4 * edu_score
-                    rescored.append((combined, rid, doc, dist, meta))
-                rescored.sort(reverse=True)
-                print(f"\n🎓 Top Profiles by Education (Keyword Matched - {len(keyword_filtered)} found):\n")
-            else:
-                # Fallback to semantic search with scoring
-                rescored = []
-                for rid, doc, dist, meta in candidates:
-                    edu_score = score_education(doc, levels)
-                    combined = (1 - dist) + 0.4 * edu_score
-                    rescored.append((combined, rid, doc, dist, meta))
-                rescored.sort(reverse=True)
-                print(f"\n🎓 Top Profiles by Education (Semantic Search - No exact keyword matches):\n")
-            
+                edu_score = score_education(doc, levels)
+                combined = (1 - dist) + 0.4 * edu_score
+                rescored.append((combined, rid, doc, dist, meta))
+            rescored.sort(reverse=True)
+            print("\n🎓 Top Profiles by Education:\n")
             for i, (combined, rid, doc, dist, meta) in enumerate(rescored[:5], 1):
                 print(f"{i}. {rid} — score: {combined:.2f} (similarity {1 - dist:.2f})")
                 preview = " ".join(doc.split()[:50]) + "..."

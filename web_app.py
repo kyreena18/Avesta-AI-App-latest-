@@ -92,55 +92,16 @@ def score_education(text: str, levels: List[str]) -> float:
     text_lower = text.lower()
     score = 0.0
     keywords = {
-        "phd": ["phd", "doctor of philosophy", "ph.d", "ph.d.", "doctorate", "doctoral"],
-        "masters": ["masters", "m.s.", "ms ", "m.tech", "mtech", "m.sc", "msc", "master of", "mba"],
-        "bachelors": ["bachelors", "b.e.", "btech", "b.tech", "b.sc", "bsc", "bca", "b.eng", "bachelor of", "bachelor's"],
+        "phd": ["phd", "doctor of philosophy"],
+        "masters": ["masters", "m.s.", "ms ", "m.tech", "mtech", "m.sc", "msc"],
+        "bachelors": ["bachelors", "b.e.", "btech", "b.tech", "b.sc", "bsc", "bca", "b.eng"],
     }
     for level in levels:
-        level_lower = level.lower()
-        if level_lower in keywords:
-            for kw in keywords[level_lower]:
-                if kw in text_lower:
-                    score += 1.0
-                    break
+        for kw in keywords.get(level.lower(), []):
+            if kw in text_lower:
+                score += 1.0
+                break
     return score
-
-
-def keyword_filter_education(text: str, levels: List[str]) -> bool:
-    """Strict keyword filtering for education levels - returns True only if exact match found"""
-    text_lower = text.lower()
-    keywords = {
-        "phd": ["phd", "doctor of philosophy", "ph.d", "ph.d.", "doctorate", "doctoral", "d.phil", "dphil"],
-        "masters": ["masters", "m.s.", "ms ", "m.tech", "mtech", "m.sc", "msc", "master of", "mba", "m.e.", "me ", "mca", "m.com", "mcom", "m.a.", "ma ", "m.sc.", "msc", "master's", "master degree"],
-        "bachelors": ["bachelors", "b.e.", "btech", "b.tech", "b.sc", "bsc", "bca", "b.eng", "bachelor of", "bachelor's", "b.com", "bcom", "b.a.", "ba ", "b.sc.", "bsc", "bachelor degree", "bachelor of technology", "bachelor of engineering"],
-    }
-    
-    for level in levels:
-        level_lower = level.lower()
-        if level_lower in keywords:
-            for kw in keywords[level_lower]:
-                if kw in text_lower:
-                    return True
-    return False
-
-
-def find_education_keywords(text: str, levels: List[str]) -> List[str]:
-    """Find and return the specific education keywords found in the text"""
-    text_lower = text.lower()
-    found_keywords = []
-    keywords = {
-        "phd": ["phd", "doctor of philosophy", "ph.d", "ph.d.", "doctorate", "doctoral", "d.phil", "dphil"],
-        "masters": ["masters", "m.s.", "ms ", "m.tech", "mtech", "m.sc", "msc", "master of", "mba", "m.e.", "me ", "mca", "m.com", "mcom", "m.a.", "ma ", "m.sc.", "msc", "master's", "master degree"],
-        "bachelors": ["bachelors", "b.e.", "btech", "b.tech", "b.sc", "bsc", "bca", "b.eng", "bachelor of", "bachelor's", "b.com", "bcom", "b.a.", "ba ", "b.sc.", "bsc", "bachelor degree", "bachelor of technology", "bachelor of engineering"],
-    }
-    
-    for level in levels:
-        level_lower = level.lower()
-        if level_lower in keywords:
-            for kw in keywords[level_lower]:
-                if kw in text_lower:
-                    found_keywords.append(kw)
-    return found_keywords
 
 
 # --- Resume mapping helpers (map cleaned text IDs to original files in resumes/) ---
@@ -260,42 +221,18 @@ def api_search_education():
     edu_input = request.form.get("levels", "").strip()
     levels = [e.strip() for e in edu_input.split(",") if e.strip()]
     semantic_query = "candidates with " + ", ".join(levels)
-    candidates = search_profiles(semantic_query, top_k=30, include_notes=False)  # Get more candidates for filtering
-    
-    # First filter by strict keyword matching
-    keyword_filtered = []
+    candidates = search_profiles(semantic_query, top_k=10, include_notes=False)
+    rescored = []
     for rid, doc, dist, meta in candidates:
-        if keyword_filter_education(doc, levels):
-            keyword_filtered.append((rid, doc, dist, meta))
-    
-    # If we have keyword matches, use those; otherwise fall back to scoring
-    if keyword_filtered:
-        rescored = []
-        for rid, doc, dist, meta in keyword_filtered:
-            edu_score = score_education(doc, levels)
-            combined = (1 - dist) + 0.4 * edu_score
-            rescored.append((combined, rid, doc, dist, meta))
-        rescored.sort(reverse=True)
-        search_type = f"Keyword Matched ({len(keyword_filtered)} found)"
-    else:
-        # Fallback to semantic search with scoring
-        rescored = []
-        for rid, doc, dist, meta in candidates:
-            edu_score = score_education(doc, levels)
-            combined = (1 - dist) + 0.4 * edu_score
-            rescored.append((combined, rid, doc, dist, meta))
-        rescored.sort(reverse=True)
-        search_type = "Semantic Search (No exact keyword matches)"
+        edu_score = score_education(doc, levels)
+        combined = (1 - dist) + 0.4 * edu_score
+        rescored.append((combined, rid, doc, dist, meta))
+    rescored.sort(reverse=True)
 
     payload = []
     for combined, rid, doc, dist, meta in rescored[:5]:
         preview = " ".join(doc.split()[:50]) + "..."
         original = find_original_resume(rid)
-        
-        # Find education keywords for highlighting
-        found_keywords = find_education_keywords(doc, levels)
-        education_highlight = ", ".join(found_keywords) if found_keywords else "No specific education keywords found"
-        
         payload.append({
             "id": rid,
             "name": display_name_from_id(rid),
@@ -304,11 +241,8 @@ def api_search_education():
             "preview": preview,
             "type": (meta.get("type") if isinstance(meta, dict) else None),
             "resume": original,
-            "search_type": search_type,
-            "education_keywords": education_highlight,
-            "found_keywords": found_keywords
         })
-    return jsonify({"results": payload, "search_type": search_type})
+    return jsonify({"results": payload})
 
 
 @app.post("/api/search/general")
