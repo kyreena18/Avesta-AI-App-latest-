@@ -4,6 +4,7 @@ __pycache__/
 *.pkl
 *.pyc
 *.log
+
 # Ignore temporary or local folders
 cleaned_resumes/
 processed resumes/
