@@ -1,4 +1,4 @@
-﻿# Ignore environment and cache files
+# Ignore environment and cache files
 .env
 __pycache__/
 *.pkl
