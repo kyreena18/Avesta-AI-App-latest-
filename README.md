@@ -1,4 +1,4 @@
-# Avesta AI Resume Search – Simple Guide
+# HireSight Resume Search – Simple Guide
 
 Welcome! This is a very simple, beginner‑friendly guide for using the Avesta AI Resume Search web application.
 
@@ -9,7 +9,7 @@ Welcome! This is a very simple, beginner‑friendly guide for using the Avesta A
 
 ## Step 1 – Open the folder
 
-1. Find the folder named `Avesta AI App` on your Desktop.
+1. Find the folder named `HireSight App` on your Desktop.
 2. Click inside the folder so you can see files like `app.py`, `web_app.py`, `requirements.txt`.
 
 ## Step 2 – Install the app (first time only)
@@ -35,7 +35,7 @@ python web_app.py
 2. Wait until you see a line that says something like: `Running on http://127.0.0.1:5000`.
 3. Open your browser (Chrome/Edge) and go to `http://127.0.0.1:5000`.
 
-You will see the Avesta AI Resume Search page.
+You will see the HireSight Resume Search page.
 
 ### How to use the web application
 
@@ -70,7 +70,7 @@ When you click “Open resume”, the app tries to open the matching original fi
 
 - Click inside the blue window and press `Ctrl + C` to stop.
 
-That’s it! You’re ready to use Avesta AI.
+That's it! You're ready to use HireSight.
 
 
 
