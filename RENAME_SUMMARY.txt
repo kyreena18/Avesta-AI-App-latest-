@@ -1,0 +1,35 @@
+═══════════════════════════════════════════════════════════════
+  RENAME COMPLETE: Avesta → HireSight
+═══════════════════════════════════════════════════════════════
+
+✓ COMPLETED: All "Avesta" references renamed to "HireSight"
+
+FILES RENAMED:
+──────────────
+- avesta_engine.py → hiresight_engine.py
+
+FILES UPDATED:
+──────────────
+✓ platform_app.py - All imports and references updated
+✓ hiresight_engine.py - All comments and code updated
+✓ database.py - Module docstring and DB filename updated
+✓ templates/base.html - Title and branding updated
+✓ templates/login.html - Title and branding updated
+✓ templates/dashboard.html - Welcome message updated
+✓ static/platform.css - CSS comment updated
+✓ README.md - All references updated
+✓ QUICKSTART.md - All references updated
+✓ PLATFORM_README.md - All references updated
+✓ HOW_TO_RUN.txt - All references updated
+✓ setup_and_run.ps1 - Script headers updated
+✓ RUN_PLATFORM.bat - Script headers updated
+
+DATABASE:
+─────────
+✓ Database filename: avesta_platform.db → hiresight_platform.db
+  (New database will be created with new name on next run)
+
+NOTE: Resume files in resumes/ folder with "_Avesta" in filename
+were NOT renamed (these are actual resume files, not code).
+
+═══════════════════════════════════════════════════════════════

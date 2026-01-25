@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block page_title %}Resume Repository{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">All Resumes ({{ resumes|length }})</h3>
+        <a href="{{ url_for('resume_upload') }}" class="btn btn-primary">Upload New Resume</a>
+    </div>
+    <div class="card-body">
+        {% if resumes %}
+        <div class="resume-grid">
+            {% for resume in resumes %}
+            <div class="resume-card">
+                <div class="resume-card-header">
+                    <div>
+                        <div class="resume-name">{{ resume.name }}</div>
+                        <div class="resume-id">{{ resume.filename }}</div>
+                    </div>
+                </div>
+                <div class="resume-badges">
+                    {% if resume.is_shortlisted %}
+                    <span class="badge badge-success">Shortlisted</span>
+                    {% endif %}
+                    {% if resume.has_file %}
+                    <span class="badge badge-primary">Has File</span>
+                    {% endif %}
+                </div>
+                <div class="resume-actions">
+                    {% if resume.has_file %}
+                    <a href="{{ url_for('serve_resume', filename=resume.original_file) }}" target="_blank" class="btn btn-sm btn-primary">View</a>
+                    <a href="{{ url_for('download_resume', resume_id=resume.id) }}" class="btn btn-sm btn-secondary">Download</a>
+                    {% endif %}
+                    <a href="{{ url_for('resume_notes', resume_id=resume.id) }}" class="btn btn-sm btn-secondary">Notes</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📄</div>
+            <div class="empty-state-text">No resumes found. Upload your first resume to get started.</div>
+            <a href="{{ url_for('resume_upload') }}" class="btn btn-primary">Upload Resume</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}HireSight Platform{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='platform.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>HIRESIGHT</h1>
+                <p class="sidebar-subtitle">Recruiter Platform</p>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('resume_repository') }}" class="nav-item {% if request.endpoint == 'resume_repository' %}active{% endif %}">
+                    <span class="nav-icon">📁</span>
+                    <span>Resume Repository</span>
+                </a>
+                <a href="{{ url_for('resume_upload') }}" class="nav-item {% if request.endpoint == 'resume_upload' %}active{% endif %}">
+                    <span class="nav-icon">⬆️</span>
+                    <span>Upload Resume</span>
+                </a>
+                <a href="{{ url_for('resume_search') }}" class="nav-item {% if request.endpoint == 'resume_search' %}active{% endif %}">
+                    <span class="nav-icon">🔍</span>
+                    <span>Search Resumes</span>
+                </a>
+                <a href="{{ url_for('jobs') }}" class="nav-item {% if request.endpoint in ['jobs', 'create_job', 'view_job'] %}active{% endif %}">
+                    <span class="nav-icon">💼</span>
+                    <span>Job Openings</span>
+                </a>
+                <a href="{{ url_for('interviews') }}" class="nav-item {% if request.endpoint in ['interviews', 'schedule_interview'] %}active{% endif %}">
+                    <span class="nav-icon">📅</span>
+                    <span>Interviews</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="{{ url_for('logout') }}" class="nav-item logout">
+                    <span class="nav-icon">🚪</span>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+                {% if session.get('user_email') %}
+                <div class="user-info">
+                    <span>{{ session.get('user_email') }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                                <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <div class="content-body">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block page_title %}Notes - {{ resume_name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Notes for {{ resume_name }}</h3>
+        <a href="{{ url_for('resume_repository') }}" class="btn btn-secondary">Back to Repository</a>
+    </div>
+    <div class="card-body">
+        <form method="POST">
+            <div class="form-group">
+                <label class="form-label">Add Note</label>
+                <textarea name="note" class="form-textarea" rows="4" placeholder="Add your note here..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Job (optional)</label>
+                <select name="job_id" class="form-select">
+                    <option value="">General Note</option>
+                    {% if jobs %}
+                    {% for job in jobs %}
+                    <option value="{{ job.id }}">{{ job.title }}</option>
+                    {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Note</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">All Notes ({{ notes|length }})</h3>
+    </div>
+    <div class="card-body">
+        {% if notes %}
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for note in notes %}
+            <div class="note-item">
+                <div class="note-text">{{ note.note_text }}</div>
+                <div class="note-meta">Added: {{ note.created_at[:19] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-text">No notes yet. Add your first note above.</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

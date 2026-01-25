@@ -1,0 +1,29 @@
+═══════════════════════════════════════════════════════════════
+  REQUIRED MODULES FOR platform_app.py
+═══════════════════════════════════════════════════════════════
+
+To run platform_app.py, you need these modules installed:
+
+1. Flask                 (pip install Flask)
+2. chromadb              (pip install chromadb)
+3. sentence-transformers (pip install sentence-transformers)
+4. PyPDF2                (pip install PyPDF2)
+5. python-docx           (pip install python-docx)
+
+═══════════════════════════════════════════════════════════════
+  QUICK INSTALL COMMAND
+═══════════════════════════════════════════════════════════════
+
+Run this in PowerShell (with venv activated):
+
+pip install Flask chromadb sentence-transformers PyPDF2 python-docx
+
+═══════════════════════════════════════════════════════════════
+  CHECK IF MODULES ARE INSTALLED
+═══════════════════════════════════════════════════════════════
+
+Run: python check_modules.py
+
+This will show which modules are installed and which are missing.
+
+═══════════════════════════════════════════════════════════════

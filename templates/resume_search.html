@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block page_title %}Search Resumes{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Search Resumes</h3>
+    </div>
+    <div class="card-body">
+        <div class="search-tabs" id="searchTabs">
+            <button type="button" class="search-tab active" data-tab="jd">Job Description</button>
+            <button type="button" class="search-tab" data-tab="skills">Skills & Experience</button>
+            <button type="button" class="search-tab" data-tab="education">Education Level</button>
+        </div>
+
+        <form method="POST" id="searchForm">
+            <input type="hidden" name="search_type" id="searchType" value="jd">
+
+            <!-- Job Description Search -->
+            <div id="jd-search" class="search-form-section">
+                <div class="form-group">
+                    <label class="form-label">Job Description</label>
+                    <textarea name="jd" class="form-textarea" rows="8" placeholder="Paste job description here..."></textarea>
+                </div>
+            </div>
+
+            <!-- Skills Search -->
+            <div id="skills-search" class="search-form-section" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Skills (comma-separated)</label>
+                    <input type="text" name="skills" class="form-input" placeholder="e.g., Python, AWS, Machine Learning">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Minimum Years of Experience</label>
+                    <input type="number" name="years" class="form-input" min="0" placeholder="e.g., 3" value="0">
+                </div>
+            </div>
+
+            <!-- Education Search -->
+            <div id="education-search" class="search-form-section" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Education Levels (comma-separated)</label>
+                    <input type="text" name="education" class="form-input" placeholder="e.g., Masters, PhD, Bachelors">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+</div>
+
+{% if results %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Search Results ({{ results|length }})</h3>
+    </div>
+    <div class="card-body">
+        {% for result in results %}
+        <div class="search-result">
+            <div class="search-result-header">
+                <div class="search-result-name">{{ result.name }}</div>
+                <div class="search-result-score">
+                    {% if result.score %}
+                        Score: {{ "%.2f"|format(result.score) }}
+                    {% else %}
+                        Similarity: {{ "%.2f"|format(result.similarity * 100) }}%
+                    {% endif %}
+                </div>
+            </div>
+            <div class="search-result-preview">{{ result.preview }}</div>
+            <div class="search-result-actions">
+                {% if result.has_file %}
+                <a href="{{ url_for('serve_resume', filename=result.original_file) }}" target="_blank" class="btn btn-sm btn-primary">View Resume</a>
+                <a href="{{ url_for('resume_notes', resume_id=result.id) }}" class="btn btn-sm btn-secondary">Notes</a>
+                {% else %}
+                <span style="color: var(--text-secondary); font-size: 14px;">Original file not found</span>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% elif query %}
+<div class="card">
+    <div class="card-body">
+        <div class="empty-state">
+            <div class="empty-state-text">No results found for your search.</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+document.querySelectorAll('.search-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        const tabType = this.dataset.tab;
+        
+        // Update active tab
+        document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        
+        // Update hidden input
+        document.getElementById('searchType').value = tabType;
+        
+        // Show/hide form sections
+        document.querySelectorAll('.search-form-section').forEach(s => s.style.display = 'none');
+        document.getElementById(tabType + '-search').style.display = 'block';
+    });
+});
+</script>
+{% endblock %}

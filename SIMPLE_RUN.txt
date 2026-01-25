@@ -1,0 +1,23 @@
+═══════════════════════════════════════════════════════════════
+  SIMPLE RUN INSTRUCTIONS
+═══════════════════════════════════════════════════════════════
+
+Your virtual environment is active (you see (.venv) in prompt).
+
+Just install Flask and run:
+
+  pip install Flask chromadb sentence-transformers PyPDF2 python-docx
+
+Then run:
+
+  python platform_app.py
+
+═══════════════════════════════════════════════════════════════
+
+If you get dependency errors, you can try installing in system Python:
+
+  1. Deactivate venv: deactivate
+  2. Install: pip install Flask chromadb sentence-transformers PyPDF2 python-docx
+  3. Run: python platform_app.py
+
+═══════════════════════════════════════════════════════════════

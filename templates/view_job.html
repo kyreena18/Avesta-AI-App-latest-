@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ job.title }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">{{ job.title }}</h3>
+        <a href="{{ url_for('jobs') }}" class="btn btn-secondary">Back to Jobs</a>
+    </div>
+    <div class="card-body">
+        <div class="job-meta" style="margin-bottom: 20px;">
+            <span>Status: <strong>{{ job.status|title }}</strong></span>
+            <span>Created: {{ job.created_at[:10] }}</span>
+        </div>
+        {% if job.description %}
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--text-primary); margin-bottom: 8px;">Description</h4>
+            <p style="color: var(--text-secondary); white-space: pre-wrap;">{{ job.description }}</p>
+        </div>
+        {% endif %}
+        {% if job.requirements %}
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: var(--text-primary); margin-bottom: 8px;">Requirements</h4>
+            <p style="color: var(--text-secondary); white-space: pre-wrap;">{{ job.requirements }}</p>
+        </div>
+        {% endif %}
+        <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+            {% if job.skills %}
+            <div>
+                <strong style="color: var(--text-primary);">Skills:</strong>
+                <span style="color: var(--text-secondary);">{{ job.skills }}</span>
+            </div>
+            {% endif %}
+            {% if job.min_experience %}
+            <div>
+                <strong style="color: var(--text-primary);">Min Experience:</strong>
+                <span style="color: var(--text-secondary);">{{ job.min_experience }} years</span>
+            </div>
+            {% endif %}
+            {% if job.education_levels %}
+            <div>
+                <strong style="color: var(--text-primary);">Education:</strong>
+                <span style="color: var(--text-secondary);">{{ job.education_levels }}</span>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Matched Resumes ({{ matched_resumes|length }})</h3>
+    </div>
+    <div class="card-body">
+        {% if matched_resumes %}
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            {% for resume in matched_resumes %}
+            <div class="search-result">
+                <div class="search-result-header">
+                    <div class="search-result-name">{{ resume.name }}</div>
+                    <div class="search-result-score">
+                        {% if resume.score %}
+                            Score: {{ "%.2f"|format(resume.score) }}
+                        {% else %}
+                            Similarity: {{ "%.2f"|format(resume.similarity * 100) }}%
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="search-result-preview">{{ resume.preview }}</div>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    {% if resume.has_file %}
+                    <a href="{{ url_for('serve_resume', filename=resume.original_file) }}" target="_blank" class="btn btn-sm btn-primary">View Resume</a>
+                    {% endif %}
+                    {% if not resume.is_shortlisted %}
+                    <form method="POST" action="{{ url_for('shortlist_resume', job_id=job.id, resume_id=resume.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-success">Shortlist</button>
+                    </form>
+                    {% else %}
+                    <span class="badge badge-success">Shortlisted</span>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('reject_resume', job_id=job.id, resume_id=resume.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                    </form>
+                    <a href="{{ url_for('resume_notes', resume_id=resume.id) }}" class="btn btn-sm btn-secondary">Notes</a>
+                </div>
+                {% if resume.notes %}
+                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border);">
+                    <strong style="color: var(--text-primary); font-size: 12px;">NOTES:</strong>
+                    {% for note in resume.notes %}
+                    <div style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">{{ note.note_text }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                <form method="POST" action="{{ url_for('add_note', job_id=job.id, resume_id=resume.id) }}" style="margin-top: 12px; display: flex; gap: 8px;">
+                    <input type="text" name="note" class="form-input" style="flex: 1;" placeholder="Add note..." required>
+                    <button type="submit" class="btn btn-sm btn-secondary">Add Note</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-text">No matched resumes yet. The system will match resumes based on job description and requirements.</div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% if shortlisted %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Shortlisted Resumes ({{ shortlisted|length }})</h3>
+    </div>
+    <div class="card-body">
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+            {% for item in shortlisted %}
+            <div style="padding: 12px; background: var(--bg-dark); border-radius: 6px; border: 1px solid var(--border);">
+                <strong style="color: var(--text-primary);">{{ item.resume_id }}</strong>
+                <span style="color: var(--text-secondary); font-size: 12px; margin-left: 12px;">Status: {{ item.status }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

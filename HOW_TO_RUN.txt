@@ -1,0 +1,47 @@
+═══════════════════════════════════════════════════════════════
+  HOW TO RUN HIRESIGHT PLATFORM
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Open PowerShell in this folder
+  - Click in the address bar
+  - Type: powershell
+  - Press Enter
+
+STEP 2: Setup and Run (EASY WAY - Recommended)
+  
+  OPTION A: Use the Setup Script (Easiest!)
+    Type: .\setup_and_run.ps1
+    Press Enter
+    Wait for setup to complete
+    Then type: python platform_app.py
+    
+  OPTION B: Manual Setup
+    Type these commands one by one:
+    
+    python -m venv .venv
+    .\.venv\Scripts\Activate.ps1
+    pip install chromadb==0.5.5 sentence-transformers==2.2.2 "transformers<4.35.0" "huggingface_hub<0.20.0" numpy scikit-learn python-dotenv PyPDF2 python-docx Flask
+    python platform_app.py
+    
+  OPTION C: Use Batch File (Windows)
+    Double-click: RUN_PLATFORM.bat
+    (Only works after setup is complete)
+
+STEP 3: Access the Platform
+  ✅ You'll see: "Running on http://127.0.0.1:5000"
+  ✅ Open browser and go to: http://localhost:5000
+  ✅ Login with any username/password (demo mode)
+  ✅ You're ready to use the platform!
+
+═══════════════════════════════════════════════════════════════
+  WHAT TO EXPECT AFTER LOGIN
+═══════════════════════════════════════════════════════════════
+
+1. Dashboard - Overview with statistics
+2. Resume Repository - View all resumes
+3. Upload Resume - Add new resumes
+4. Search Resumes - Search using HireSight AI
+5. Job Openings - Create jobs and match candidates
+6. Interviews - Schedule interviews
+
+═══════════════════════════════════════════════════════════════

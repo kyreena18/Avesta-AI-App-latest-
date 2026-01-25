@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block page_title %}Interviews{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Scheduled Interviews ({{ interviews|length }})</h3>
+        <a href="{{ url_for('schedule_interview') }}" class="btn btn-primary">Schedule Interview</a>
+    </div>
+    <div class="card-body">
+        {% if interviews %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Resume</th>
+                    <th>Job</th>
+                    <th>Scheduled Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for interview in interviews %}
+                <tr>
+                    <td>{{ interview.resume_name }}</td>
+                    <td>{{ interview.job_title }}</td>
+                    <td>{{ interview.scheduled_date[:16] if interview.scheduled_date else 'Not set' }}</td>
+                    <td>{{ interview.interview_type|title }}</td>
+                    <td>
+                        <span class="badge badge-{{ 'success' if interview.status == 'completed' else 'primary' if interview.status == 'scheduled' else 'secondary' }}">
+                            {{ interview.status|title }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('update_interview_status', interview_id=interview.id) }}" style="display: inline;">
+                            <select name="status" class="form-select" style="width: auto; display: inline-block; padding: 4px 8px; font-size: 12px;" onchange="this.form.submit()">
+                                <option value="scheduled" {% if interview.status == 'scheduled' %}selected{% endif %}>Scheduled</option>
+                                <option value="completed" {% if interview.status == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="cancelled" {% if interview.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📅</div>
+            <div class="empty-state-text">No interviews scheduled yet. Schedule your first interview to get started.</div>
+            <a href="{{ url_for('schedule_interview') }}" class="btn btn-primary">Schedule Interview</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

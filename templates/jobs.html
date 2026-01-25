@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block page_title %}Job Openings{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Job Openings ({{ jobs|length }})</h3>
+        <a href="{{ url_for('create_job') }}" class="btn btn-primary">Create New Job</a>
+    </div>
+    <div class="card-body">
+        {% if jobs %}
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+            {% for job in jobs %}
+            <div class="job-card">
+                <div class="job-title">{{ job.title }}</div>
+                <div class="job-meta">
+                    <span>Status: <strong>{{ job.status|title }}</strong></span>
+                    <span>Created: {{ job.created_at[:10] }}</span>
+                </div>
+                {% if job.description %}
+                <div class="job-description">{{ job.description[:200] }}{% if job.description|length > 200 %}...{% endif %}</div>
+                {% endif %}
+                <div class="job-actions">
+                    <a href="{{ url_for('view_job', job_id=job.id) }}" class="btn btn-primary btn-sm">View Details</a>
+                    {% if job.status == 'active' %}
+                    <form method="POST" action="{{ url_for('update_job_status', job_id=job.id) }}" style="display: inline;">
+                        <input type="hidden" name="status" value="closed">
+                        <button type="submit" class="btn btn-secondary btn-sm">Close Job</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">💼</div>
+            <div class="empty-state-text">No job openings yet. Create your first job opening to get started.</div>
+            <a href="{{ url_for('create_job') }}" class="btn btn-primary">Create Job Opening</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

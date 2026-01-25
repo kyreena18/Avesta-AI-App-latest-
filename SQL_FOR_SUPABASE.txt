@@ -1,0 +1,107 @@
+═══════════════════════════════════════════════════════════════
+  COPY THIS SQL INTO SUPABASE SQL EDITOR
+═══════════════════════════════════════════════════════════════
+
+STEP 1: Go to Supabase Dashboard
+  → https://app.supabase.com
+  → Select your project
+  → Click "SQL Editor" in left sidebar
+
+STEP 2: Click "New Query"
+
+STEP 3: Copy and paste the SQL code below
+
+STEP 4: Click "Run" (or press Ctrl+Enter)
+
+═══════════════════════════════════════════════════════════════
+
+SQL CODE TO COPY:
+
+-- Jobs table
+CREATE TABLE IF NOT EXISTS jobs (
+    id BIGSERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    requirements TEXT,
+    skills TEXT,
+    min_experience INTEGER DEFAULT 0,
+    education_levels TEXT,
+    status TEXT DEFAULT 'active',
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Shortlists table
+CREATE TABLE IF NOT EXISTS shortlists (
+    id BIGSERIAL PRIMARY KEY,
+    resume_id TEXT NOT NULL,
+    job_id BIGINT REFERENCES jobs(id) ON DELETE CASCADE,
+    status TEXT DEFAULT 'shortlisted',
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Notes table
+CREATE TABLE IF NOT EXISTS notes (
+    id BIGSERIAL PRIMARY KEY,
+    resume_id TEXT NOT NULL,
+    job_id BIGINT REFERENCES jobs(id) ON DELETE CASCADE,
+    note_text TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Interviews table
+CREATE TABLE IF NOT EXISTS interviews (
+    id BIGSERIAL PRIMARY KEY,
+    resume_id TEXT NOT NULL,
+    job_id BIGINT REFERENCES jobs(id) ON DELETE CASCADE,
+    scheduled_date TIMESTAMPTZ,
+    interview_type TEXT DEFAULT 'phone',
+    status TEXT DEFAULT 'scheduled',
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
+CREATE INDEX IF NOT EXISTS idx_shortlists_job_id ON shortlists(job_id);
+CREATE INDEX IF NOT EXISTS idx_shortlists_resume_id ON shortlists(resume_id);
+CREATE INDEX IF NOT EXISTS idx_notes_resume_id ON notes(resume_id);
+CREATE INDEX IF NOT EXISTS idx_notes_job_id ON notes(job_id);
+CREATE INDEX IF NOT EXISTS idx_interviews_resume_id ON interviews(resume_id);
+CREATE INDEX IF NOT EXISTS idx_interviews_job_id ON interviews(job_id);
+
+-- Enable Row Level Security
+ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shortlists ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE interviews ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+DROP POLICY IF EXISTS "Allow all for authenticated users" ON jobs;
+CREATE POLICY "Allow all for authenticated users" ON jobs
+    FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Allow all for authenticated users" ON shortlists;
+CREATE POLICY "Allow all for authenticated users" ON shortlists
+    FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Allow all for authenticated users" ON notes;
+CREATE POLICY "Allow all for authenticated users" ON notes
+    FOR ALL USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "Allow all for authenticated users" ON interviews;
+CREATE POLICY "Allow all for authenticated users" ON interviews
+    FOR ALL USING (auth.role() = 'authenticated');
+
+═══════════════════════════════════════════════════════════════
+
+WHAT THIS CREATES:
+──────────────────
+✓ jobs table - Stores job openings
+✓ shortlists table - Stores shortlisted resumes
+✓ notes table - Stores recruiter notes
+✓ interviews table - Stores interview schedules
+✓ Indexes for better performance
+✓ Row Level Security policies
+
+═══════════════════════════════════════════════════════════════

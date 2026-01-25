@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ total_resumes }}</div>
+        <div class="stat-label">Total Resumes</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ total_jobs }}</div>
+        <div class="stat-label">Job Openings</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ active_jobs }}</div>
+        <div class="stat-label">Active Jobs</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value">{{ shortlisted_count }}</div>
+        <div class="stat-label">Shortlisted</div>
+    </div>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Quick Actions</h3>
+        </div>
+        <div class="card-body">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a href="{{ url_for('resume_upload') }}" class="btn btn-primary">Upload Resume</a>
+                <a href="{{ url_for('create_job') }}" class="btn btn-primary">Create Job Opening</a>
+                <a href="{{ url_for('resume_search') }}" class="btn btn-secondary">Search Resumes</a>
+                <a href="{{ url_for('schedule_interview') }}" class="btn btn-secondary">Schedule Interview</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Platform Overview</h3>
+        </div>
+        <div class="card-body">
+            <p style="color: var(--text-secondary); line-height: 1.8;">
+                Welcome to the HireSight Recruiter Platform. Use the sidebar to navigate through 
+                resume management, job openings, and interview scheduling features.
+            </p>
+            <div style="margin-top: 20px;">
+                <h4 style="color: var(--text-primary); margin-bottom: 12px; font-size: 16px;">Key Features:</h4>
+                <ul style="color: var(--text-secondary); line-height: 2;">
+                    <li>Upload and index resumes automatically</li>
+                    <li>Search resumes using AI-powered semantic search</li>
+                    <li>Create job openings and get matched candidates</li>
+                    <li>Shortlist candidates and add notes</li>
+                    <li>Schedule and track interviews</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block page_title %}Upload Resume{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Upload Resume</h3>
+        <a href="{{ url_for('resume_repository') }}" class="btn btn-secondary">Back to Repository</a>
+    </div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label class="form-label">Select Resume File (PDF or DOCX)</label>
+                <input type="file" name="file" class="form-input" accept=".pdf,.docx" required>
+                <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">
+                    Supported formats: PDF, DOCX. The resume will be automatically processed and indexed.
+                </div>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <button type="submit" class="btn btn-primary">Upload & Index</button>
+                <a href="{{ url_for('resume_repository') }}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Upload Instructions</h3>
+    </div>
+    <div class="card-body">
+        <ul style="color: var(--text-secondary); line-height: 2;">
+            <li>Upload PDF or DOCX resume files</li>
+            <li>The system will automatically extract text from your resume</li>
+            <li>Text will be cleaned and indexed for search</li>
+            <li>Resume will appear in the repository immediately after processing</li>
+            <li>Original file is preserved for download</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
